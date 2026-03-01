@@ -4,7 +4,7 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 
 
-# Класс для управления таймером, который будет использоваться для обновления иконки в трее
+# Класс для управления таймером
 class IconTimer(QtCore.QObject):
     timeout = QtCore.Signal()
 
