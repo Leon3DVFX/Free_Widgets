@@ -34,10 +34,26 @@ class IconTimerWidget(QtWidgets.QWidget):
         self.timer = IconTimer(self)
         self.timer.timeout.connect(self.update_icon)
         self.icon = QtGui.QPixmap(icon_path) if icon_path else None
-        self.icon.scaledToHeight(height, mode = QtCore.Qt.TransformationMode.SmoothTransformation)
+
+        if self.icon is not None:
+            self.icon.scaledToHeight(height, mode = QtCore.Qt.TransformationMode.SmoothTransformation)
         self.timer.start(interval)
         self.timer.timeout.connect(self.update_icon) # Подключаем сигнал таймера
 
     def update_icon(self):
-        # Здесь можно добавить код для обновления иконки в трее
-        pass
+        print('Время вышло')
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setRenderHints(QtGui.QPainter.RenderHint.Antialiasing)
+        rect = QtCore.QRect(50, 50, 200, 200)
+        start_angle = 90*16
+        span_angle = -270*16
+        painter.drawArc(rect, start_angle, span_angle)
+
+if __name__ == '__main__':
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    win = IconTimerWidget(interval=1000)
+    win.show()
+    sys.exit(app.exec())
