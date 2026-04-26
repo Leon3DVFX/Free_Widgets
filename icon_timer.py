@@ -3,35 +3,19 @@
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
-# Класс основной таймер
-class IconTimer(QtCore.QObject):
-    timeout = QtCore.Signal()
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._timer = QtCore.QTimer(self)
-        self._timer.setTimerType(QtCore.Qt.TimerType.CoarseTimer)
-        self._timer.timeout.connect(self.timeout.emit)
-
-    def start(self, interval):
-        self._timer.start(interval)
-
-    def stop(self):
-        self._timer.stop()
-
-    def isActive(self):
-        return self._timer.isActive()
 
 # Класс виджет таймер - иконка + анимация
 class IconTimerWidget(QtWidgets.QWidget):
+    timeout = QtCore.Signal()
     def __init__(self, parent=None, interval=1000, icon_path=None, height=16, pen_width = 1,
-                 pen_color=QtGui.QColor(255, 255, 255, 100), ring_gap=2):
+                 pen_color=QtGui.QColor(255, 255, 255, 100), ring_gap=2, auto_update=False):
         super().__init__(parent)
         # Предварительная настройка таймера
         self.interval = max(1, int(interval))
         self.remaining_ms = float(self.interval)
         self._icon_height = max(1, int(height))
         self.ring_gap = max(0, int(ring_gap))
+        self.auto_update = bool(auto_update)
         # Только размеры виджета и полная прозрачность
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -39,7 +23,7 @@ class IconTimerWidget(QtWidgets.QWidget):
         self._icon_source = QtGui.QPixmap(icon_path) if icon_path else QtGui.QPixmap()
         self.icon = QtGui.QPixmap()
 
-        # Настройка пена (предварительно) TODO: Сделать настраиваемо
+        # Настройка пена (предварительно)
         self.pen = QtGui.QPen(pen_color, max(1, int(pen_width)))
         widget_size = self._icon_height + (2 * self.ring_gap) + (2 * self.pen.width())
         self.resize(widget_size, widget_size)
@@ -51,8 +35,15 @@ class IconTimerWidget(QtWidgets.QWidget):
         self.tick.timeout.connect(self._on_tick)
 
         self.elapsed = QtCore.QElapsedTimer()
+        self._restart_timer()
+
+        self.timeout.connect(lambda : print('Hello'))
+
+    def _restart_timer(self):
+        self.remaining_ms = float(self.interval)
         self.elapsed.start()
         self.tick.start()
+        self.update()
 
     def _arc_rect(self):
         half_pen = self.pen.widthF() / 2.0
@@ -83,10 +74,14 @@ class IconTimerWidget(QtWidgets.QWidget):
             self.time_out()
     # Метод TimeOut таймера
     def time_out(self):
-        print("Time out")
-        self.close()
+        self.timeout.emit()
+        if self.auto_update:
+            self._restart_timer()
 
     # Перерисовка виджета
+    def set_auto_update(self, enabled):
+        self.auto_update = bool(enabled)
+
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setRenderHints(
@@ -111,9 +106,13 @@ class IconTimerWidget(QtWidgets.QWidget):
 if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    win = IconTimerWidget(interval=3000, pen_width=3, pen_color=QtGui.QColor(243, 75, 105, 150), height=50,
+    win = IconTimerWidget(interval=3000,
+                          pen_width=3.5,
+                          pen_color=QtGui.QColor(243, 75, 105, 150),
+                          height=50,
                           ring_gap=0,
-                          icon_path=r"C:\Users\User\Desktop\icons_test\icons\py_active.png")
+                          auto_update=True,
+                          icon_path=r"C:\Users\User\Desktop\icons_test\icons\m_icon11.png")
     win.show()
     win.show()
     sys.exit(app.exec())
