@@ -36,8 +36,8 @@ class IconTimerWidget(QtWidgets.QWidget):
 
         self.elapsed = QtCore.QElapsedTimer()
         self._restart_timer()
-
-        self.timeout.connect(lambda : print('Hello'))
+        # Тестирование основного сигнала
+        self.timeout.connect(lambda : print('Test String'))
 
     def _restart_timer(self):
         self.remaining_ms = float(self.interval)
@@ -111,8 +111,7 @@ if __name__ == '__main__':
                           pen_color=QtGui.QColor(243, 75, 105, 150),
                           height=50,
                           ring_gap=0,
-                          auto_update=True,
+                          auto_update=False,
                           icon_path=r"C:\Users\User\Desktop\icons_test\icons\m_icon11.png")
-    win.show()
     win.show()
     sys.exit(app.exec())
