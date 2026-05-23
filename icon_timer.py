@@ -60,7 +60,7 @@ class IconTimerWidget(QtWidgets.QWidget):
             target_height,
             mode=QtCore.Qt.TransformationMode.SmoothTransformation,
         )
-
+    # События изменения размера
     def resizeEvent(self, event):
         self._rescale_icon()
         super().resizeEvent(event)
@@ -107,11 +107,11 @@ if __name__ == '__main__':
     import sys
     app = QtWidgets.QApplication(sys.argv)
     win = IconTimerWidget(interval=3000,
-                          pen_width=3.5,
+                          pen_width=10,
                           pen_color=QtGui.QColor(243, 75, 105, 150),
-                          height=50,
+                          height=80,
                           ring_gap=0,
-                          auto_update=False,
+                          auto_update=True,
                           icon_path=r"C:\Users\User\Desktop\icons_test\icons\m_icon11.png")
     win.show()
     sys.exit(app.exec())
